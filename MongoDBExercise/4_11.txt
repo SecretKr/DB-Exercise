@@ -1,0 +1,7 @@
+db.customer.aggregate([
+  {$lookup: {from: "orders", localField: "customer_id", foreignField: "customer_id", as: "combine"}},
+  {$set: {order_count: {$size: "$combine"}}},
+  {$match: {order_count: 0}},
+  {$sort: {customer_id: 1}},
+  {$project: {_id:0, customer_id: 1, customer_name: 1}}
+])

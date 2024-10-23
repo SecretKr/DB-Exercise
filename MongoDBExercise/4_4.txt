@@ -1,0 +1,11 @@
+db.orders.aggregate([
+  { $unwind: "$order_lines" },
+  { $group: { _id: "$order_lines.product_id", total_orders: { $sum: 1 } } },
+  { $group: { _id: "$total_orders", product_list: { $push: "$_id" } } },
+  { $sort: { _id: -1 } },
+  { $limit: 1 },
+  { $unwind: "$product_list" },
+  { $lookup: {from: "product", localField: "product_list", foreignField: "product_id", as: "product" } },
+  { $unwind: "$product" },
+  { $project: { _id: 0, product_id: "$product.product_id", product_description: "$product.product_name" } }
+])
